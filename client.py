@@ -41,7 +41,7 @@ def plot_one_box(x, img, color=None, label="person", line_thickness=None):
         )
 
 def main():  
-    img = cv2.imread("images/bus.jpg")
+    img = cv2.imread("images/test.jpg")
     bFrame = get_img_bytes(img)
     request_input = {'image': bFrame}
     result = requests.post('http://127.0.0.1:7000/infer', files=request_input).json()
