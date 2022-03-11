@@ -2,14 +2,13 @@ import numpy as np
 import time
 import cv2
 from flask import Flask, jsonify, request
-from model import YOLOv5_face, YOLOv5_plate
+from model import YOLOv5_face
 
 app = Flask(__name__)
 face_det = YOLOv5_face()
-plate_det = YOLOv5_plate()
 
-@app.route("/detect_one", methods=["POST"])
-def detect_one():
+@app.route("/detect_face_one", methods=["POST"])
+def detect_face_one():
     result = {"success": False}
     if request.method == "POST":
         if request.files.get("image") is not None:
