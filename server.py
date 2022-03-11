@@ -7,8 +7,8 @@ from model import YOLOv5
 app = Flask(__name__)
 det = YOLOv5()
 
-@app.route("/infer", methods=["POST"])
-def predict():
+@app.route("/detect_one", methods=["POST"])
+def detect_one():
     result = {"success": False}
     if request.method == "POST":
         if request.files.get("image") is not None:
@@ -25,17 +25,24 @@ def predict():
  
                 if (outs is None) and (len(outs) < 0):
                     result["success"] = False
-                # 将结果保存为json格式
-                # result["box"] = outs[0].tolist()
-                # result["conf"] = outs[1].tolist()
-                # result["classid"] = outs[2].tolist()
-                result["img"] = outs[0].tolist()
-                result['success'] = True
-            
+                else:
+                    # 将结果保存为json格式
+                    print(outs)
+                    result['id'] = outs[0]
+                    result['category'] = outs[1]
+                    result['points'] = outs[2]
+                    result['success'] = True
             except Exception:
                 print(Exception)
-        
+    
     return jsonify(result)
+
+@app.route("/detect_batch", methods=["POST"])
+def detect_batch():
+    result = {"success": False}
+
+    return jsonify(result)
+
 
 if __name__ == "__main__":
     print(("* Loading yolov5 model and Flask starting server..."

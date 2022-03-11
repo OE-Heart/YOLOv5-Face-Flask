@@ -1,21 +1,11 @@
 # -*- coding: UTF-8 -*-
-import argparse
-import time
-from pathlib import Path
-
 import cv2
 import numpy as np
 import torch
-import torch.backends.cudnn as cudnn
-from numpy import random
-import copy
-
 from models.experimental import attempt_load
 from utils.datasets import letterbox
-from utils.general import check_img_size, non_max_suppression_face, apply_classifier, scale_coords, xyxy2xywh, \
-    strip_optimizer, set_logging, increment_path
-from utils.plots import plot_one_box
-from utils.torch_utils import select_device, load_classifier, time_synchronized
+from utils.general import check_img_size, non_max_suppression_face, scale_coords, xyxy2xywh
+from utils.torch_utils import select_device
 
 def scale_coords_landmarks(img1_shape, coords, img0_shape, ratio_pad=None):
     # Rescale coords (xyxy) from img1_shape to img0_shape
@@ -106,7 +96,6 @@ class YOLOv5(object):
             img = img.unsqueeze(0)
 
         # 推理
-        t1 = time_synchronized()
         pred = self.model(img, augment=True)[0]
 
         # Apply NMS
@@ -114,10 +103,12 @@ class YOLOv5(object):
 
         print('img.shape: ', img.shape)
         print('inImg.shape: ', inImg.shape)
+
+        h, w, c = inImg.shape
         
-        bbox_xyxy = []
-        confs = []
-        cls_ids = []
+        id = []
+        category = []
+        points = []
 
         # 解析检测结果
         for i, det in enumerate(pred):  # detections per image
@@ -136,24 +127,23 @@ class YOLOv5(object):
                 
                 for j in range(det.size()[0]):
                     xywh = (xyxy2xywh(det[j, :4].view(1, 4)) / gn).view(-1).tolist()
-                    conf = det[j, 4].cpu().numpy()
-                    landmarks = (det[j, 5:15].view(1, 10) / gn_lks).view(-1).tolist()
+                    conf = det[j, 4].cpu().numpy() # 检测框文字
+                    landmarks = (det[j, 5:15].view(1, 10) / gn_lks).view(-1).tolist() # 五官检测点
                     class_num = det[j, 15].cpu().numpy()
                     inImg = show_results(inImg, xywh, conf, landmarks, class_num)
+                    
+                    x1 = int(xywh[0] * w - 0.5 * xywh[2] * w)
+                    y1 = int(xywh[1] * h - 0.5 * xywh[3] * h)
+                    x2 = int(xywh[0] * w + 0.5 * xywh[2] * w)
+                    y2 = int(xywh[1] * h + 0.5 * xywh[3] * h)
+                    point = {'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2}
+
+                    id.append(j)
+                    category.append(int(class_num))
+                    points.append(point)
             else:
                 print("None")
 
-        cv2.imwrite('result.jpg', inImg)
+        # cv2.imwrite('result.jpg', inImg)
 
-
-                # # 保存结果
-                # for *xyxy, conf, cls in reversed(det):
-                #     bbox_xyxy.append(xyxy)
-                #     confs.append(conf.item())
-                #     cls_ids.append(int(cls.item()))
-    
-                # xyxys = torch.Tensor(bbox_xyxy)
-                # confss = torch.Tensor(confs)
-                # cls_ids = torch.Tensor(cls_ids)
-
-        return inImg
+        return id, category, points
