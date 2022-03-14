@@ -115,8 +115,8 @@ class YOLOv5_face(object):
         # Apply NMS
         pred = non_max_suppression_face(pred, self.conf_thres, self.iou_thres)
 
-        print('img.shape: ', img.shape)
-        print('inImg.shape: ', inImg.shape)
+        # print('img.shape: ', img.shape)
+        # print('inImg.shape: ', inImg.shape)
 
         h, w, c = inImg.shape
         
@@ -147,18 +147,19 @@ class YOLOv5_face(object):
                     # inImg = show_results(inImg, xywh, conf, landmarks, class_num)
                     inImg = add_mosaic(inImg, xywh, 15)
                     
-                    x1 = int(xywh[0] * w - 0.5 * xywh[2] * w)
-                    y1 = int(xywh[1] * h - 0.5 * xywh[3] * h)
-                    x2 = int(xywh[0] * w + 0.5 * xywh[2] * w)
-                    y2 = int(xywh[1] * h + 0.5 * xywh[3] * h)
-                    point = {'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2}
+                    # x1 = int(xywh[0] * w - 0.5 * xywh[2] * w)
+                    # y1 = int(xywh[1] * h - 0.5 * xywh[3] * h)
+                    # x2 = int(xywh[0] * w + 0.5 * xywh[2] * w)
+                    # y2 = int(xywh[1] * h + 0.5 * xywh[3] * h)
+                    # point = {'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2}
 
-                    id.append(j)
-                    category.append(int(class_num))
-                    points.append(point)
-            else:
-                print("None")
+                    # id.append(j)
+                    # category.append(int(class_num))
+                    # points.append(point)
+            # else:
+            #     print("None")
 
-        cv2.imwrite('result.jpg', inImg)
+        # cv2.imwrite('result.jpg', inImg)
 
-        return id, category, points
+        # return id, category, points
+        return inImg

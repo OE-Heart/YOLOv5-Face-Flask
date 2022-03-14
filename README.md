@@ -14,8 +14,9 @@ python client.py
 - [x] Faces Detection
 - [x] Mosaic of faces
 - [x] Single image processing
+- [x] Video processing
+- [ ] Multithreading
 - [ ] Batch processing
-- [ ] Video processing
 
 ## Result
 
