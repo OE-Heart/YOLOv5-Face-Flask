@@ -53,6 +53,20 @@ def show_results(img, xywh, conf, landmarks, class_num):
     cv2.putText(img, label, (x1, y1 - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
     return img
 
+def add_mosaic(img, xywh, step):
+    h,w,c = img.shape
+    x1 = int(xywh[0] * w - 0.5 * xywh[2] * w)
+    y1 = int(xywh[1] * h - 0.5 * xywh[3] * h)
+    x2 = int(xywh[0] * w + 0.5 * xywh[2] * w)
+    y2 = int(xywh[1] * h + 0.5 * xywh[3] * h)
+
+    for i in range(0, y2 - y1 - step, step):
+        for j in range(0, x2 - x1 - step, step):
+            color = img[i + y1][j + x1].tolist()
+            cv2.rectangle(img, (x1 + j, y1 + i), (x1 + j + step - 1, y1 + i + step - 1), color, -1)
+
+    return img
+
 class YOLOv5_face(object):
     # 参数设置
     _defaults = {
@@ -130,7 +144,8 @@ class YOLOv5_face(object):
                     conf = det[j, 4].cpu().numpy() # 检测框文字
                     landmarks = (det[j, 5:15].view(1, 10) / gn_lks).view(-1).tolist() # 五官检测点
                     class_num = det[j, 15].cpu().numpy()
-                    inImg = show_results(inImg, xywh, conf, landmarks, class_num)
+                    # inImg = show_results(inImg, xywh, conf, landmarks, class_num)
+                    inImg = add_mosaic(inImg, xywh, 15)
                     
                     x1 = int(xywh[0] * w - 0.5 * xywh[2] * w)
                     y1 = int(xywh[1] * h - 0.5 * xywh[3] * h)

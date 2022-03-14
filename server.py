@@ -46,4 +46,4 @@ def detect_batch():
 if __name__ == "__main__":
     print(("* Loading yolov5 model and Flask starting server..."
         "please wait until server has fully started"))
-    app.run(host='127.0.0.1', port=7000)
+    app.run(host='127.0.0.1', port=7000, debug=True)
